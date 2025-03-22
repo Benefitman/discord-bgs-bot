@@ -33,15 +33,11 @@ async def fetch_system_data(session, system_name):
         return data.get("docs", [])
 
 
-async def post_report():
-    await client.login(TOKEN)
-    await client.connect()
-
+async def send_report():
     async with aiohttp.ClientSession() as session:
         faction_data = await fetch_faction_data(session)
         if not faction_data:
             print("[FEHLER] Keine Fraktionsdaten erhalten.")
-            await client.close()
             return
 
         faction = faction_data[0]
@@ -84,7 +80,7 @@ async def post_report():
             for name, influence, conflict in systems_to_report:
                 value = f"*influence: {influence:.2f}%*"
                 if conflict:
-                    value += f"\n**⚔️ Konflikt:** {conflict}"
+                    value += f"\n**⚔️ Konflikt:** {conflict}!"
                 embed.add_field(name=f"**{name}**", value=value, inline=False)
 
             channel = await client.fetch_channel(CHANNEL_ID)
@@ -92,8 +88,13 @@ async def post_report():
         else:
             print("Kein System mit niedrigem Einfluss gefunden.")
 
+
+@client.event
+async def on_ready():
+    print(f"✅ Bot gestartet als {client.user}")
+    await send_report()
     await client.close()
 
 
 if __name__ == "__main__":
-    asyncio.run(post_report())
+    client.run(TOKEN)
