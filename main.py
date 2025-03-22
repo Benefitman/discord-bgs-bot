@@ -6,14 +6,12 @@ from discord.ext import commands
 
 TOKEN = os.getenv("DISCORD_BOT_TOKEN", "").strip()
 if not TOKEN:
-    raise ValueError(
-        "[FEHLER] Die Umgebungsvariable DISCORD_BOT_TOKEN ist nicht gesetzt!")
+    raise ValueError("[FEHLER] Die Umgebungsvariable DISCORD_BOT_TOKEN ist nicht gesetzt!")
 
 FACTION_NAME = "House of Saga"
 CHANNEL_ID = os.getenv("DISCORD_CHANNEL_ID")
 if CHANNEL_ID is None:
-    raise ValueError(
-        "[FEHLER] Die Umgebungsvariable DISCORD_CHANNEL_ID ist nicht gesetzt!")
+    raise ValueError("[FEHLER] Die Umgebungsvariable DISCORD_CHANNEL_ID ist nicht gesetzt!")
 CHANNEL_ID = int(CHANNEL_ID)
 
 BGS_API_URL = "https://elitebgs.app/api/ebgs/v5"
@@ -33,9 +31,7 @@ async def fetch_faction_data(session):
             data = await response.json()
             return data.get("docs", [])
         else:
-            print(
-                f"[FEHLER] Fehler beim Abrufen der Fraktionsdaten: {response.status}"
-            )
+            print(f"[FEHLER] Fehler beim Abrufen der Fraktionsdaten: {response.status}")
             return []
 
 
@@ -47,9 +43,7 @@ async def fetch_system_data(session, system_name):
             data = await response.json()
             return data.get("docs", [])
         else:
-            print(
-                f"[FEHLER] Fehler beim Abrufen der Systemdaten für {system_name}: {response.status}"
-            )
+            print(f"[FEHLER] Fehler beim Abrufen der Systemdaten für {system_name}: {response.status}")
             return []
 
 
@@ -71,8 +65,7 @@ async def check_faction_influence():
                 continue
 
             system = system_data[0]
-            controlling_faction = system.get("controlling_minor_faction",
-                                             "").lower()
+            controlling_faction = system.get("controlling_minor_faction", "").lower()
             if controlling_faction == FACTION_NAME.lower():
                 influence = presence.get("influence", 0) * 100
                 if influence < 49:
@@ -80,46 +73,43 @@ async def check_faction_influence():
                     for conflict in presence.get("conflicts", []):
                         status = conflict.get("status", "").lower()
                         conflict_type = conflict.get("type", "").lower()
-                        if status in [
-                                "active", "pending"
-                        ] and conflict_type in ["war", "election"]:
-                            opponent = conflict.get("opposing_faction",
-                                                    {}).get(
-                                                        "name", "Unbekannt")
+                        if status in ["active", "pending"] and conflict_type in ["war", "election"]:
+                            opponent = conflict.get("opposing_faction", {}).get("name", "Unbekannt")
                             conflict_info = f" – {conflict_type.title()} mit {opponent}"
                             has_conflict = True
                             break
 
-                    systems_to_report.append(
-                        (system_name, influence, conflict_info))
+                    systems_to_report.append((system_name, influence, conflict_info))
 
         if systems_to_report:
             systems_to_report.sort(key=lambda x: x[1], reverse=True)
 
-            embed_color = 0xFF5733 if has_conflict else 0x1B365D  # Inara-Stil
+            embed_color = 0xFF5733 if has_conflict else 0x1B365D
             embed = discord.Embed(
-                title=f"⚠️ INFLUENCE BELOW 49% ⚠️",
+                title=f"⚠️ INFLUENCE BELOW 49% ⚠️ – {FACTION_NAME}",
                 description="**Following Systems need Work:**",
-                color=embed_color)
+                color=embed_color
+            )
 
             for name, influence, conflict in systems_to_report:
                 value = f"*influence: {influence:.2f}%*"
                 if conflict:
-                    value += f"\n**⚔️ Conflict:** {conflict}"
+                    value += f"\n**⚔️ Konflikt:** {conflict}"
                 embed.add_field(name=f"**{name}**", value=value, inline=False)
 
             channel = client.get_channel(CHANNEL_ID)
             if channel:
                 await channel.send(embed=embed)
         else:
-            print(f"'{FACTION_NAME}' has no controlling System below 49 %.")
+            print(f"'{FACTION_NAME}' No System we control is below 49 %.")
 
 
-@client.event
-async def on_ready():
-    print(f'{client.user} hat sich erfolgreich eingeloggt.')
+async def main():
+    await client.login(TOKEN)
+    await client.connect()
     await check_faction_influence()
+    await client.close()
 
 
 if __name__ == "__main__":
-    client.run(TOKEN)
+    asyncio.run(main())
