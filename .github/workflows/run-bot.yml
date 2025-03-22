@@ -2,8 +2,11 @@ name: Run Discord Bot Twice Daily
 
 on:
   schedule:
-    - cron: '0 6,18 * * *'  # UTC → 8:00 und 20:00 MEZ
+    - cron: '0 23 * * *'   # 00:00 lokal
+    - cron: '0 11 * * *'   # 12:00 lokal
+    - cron: '0 19 * * *'   # 20:00 lokal
   workflow_dispatch:
+
 
 jobs:
   run-bot:
