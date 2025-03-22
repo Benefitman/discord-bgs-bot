@@ -20,6 +20,7 @@ intents = discord.Intents.default()
 intents.messages = True
 intents.guilds = True
 intents.message_content = True
+
 client = commands.Bot(command_prefix="!", intents=intents)
 
 
@@ -48,10 +49,12 @@ async def fetch_system_data(session, system_name):
 
 
 async def check_faction_influence():
+    await client.wait_until_ready()
     async with aiohttp.ClientSession() as session:
         faction_data = await fetch_faction_data(session)
         if not faction_data:
             print("[FEHLER] Keine Daten für die Fraktion gefunden.")
+            await client.close()
             return
 
         faction = faction_data[0]
@@ -100,16 +103,15 @@ async def check_faction_influence():
             channel = client.get_channel(CHANNEL_ID)
             if channel:
                 await channel.send(embed=embed)
-        else:
-            print(f"'{FACTION_NAME}' No System we control is below 49 %.")
 
-
-async def main():
-    await client.login(TOKEN)
-    await client.connect()
-    await check_faction_influence()
     await client.close()
 
 
+@client.event
+async def on_ready():
+    print(f"{client.user} eingeloggt.")
+    await check_faction_influence()
+
+
 if __name__ == "__main__":
-    asyncio.run(main())
+    client.run(TOKEN)
