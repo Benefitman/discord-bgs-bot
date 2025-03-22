@@ -24,7 +24,6 @@ jobs:
 
       - name: Run the bot
         run: python main.py
-env:
-  DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
-  DISCORD_CHANNEL_ID: ${{ secrets.DISCORD_CHANNEL_ID }}
-
+        env:
+          DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
+          DISCORD_CHANNEL_ID: ${{ secrets.DISCORD_CHANNEL_ID }}
