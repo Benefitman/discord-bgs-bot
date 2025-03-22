@@ -1,0 +1,155 @@
+[DEBUG] HIP 18828: House of Saga not present
+[DEBUG] HIP 20638: House of Saga not present
+[DEBUG] Ixbakald: House of Saga not present
+[DEBUG] Un No Myoin: House of Saga not present
+[DEBUG] HIP 20048: House of Saga not present
+[DEBUG] Gliese 9152: House of Saga not present
+[DEBUG] Yuggera: House of Saga not present
+[DEBUG] Napote: House of Saga not present
+[DEBUG] Opet: House of Saga not present
+[DEBUG] HIP 22281: House of Saga not present
+[DEBUG] Wangal: House of Saga not present
+[DEBUG] Comanes: House of Saga not present
+[DEBUG] CD-36 1535: House of Saga not present
+[DEBUG] Belalans: House of Saga not present
+[DEBUG] Prydereti: House of Saga not present
+[DEBUG] Nasaraudi: House of Saga not present
+[DEBUG] Manatera: House of Saga not present
+[DEBUG] Arabrini: House of Saga not present
+[DEBUG] Djenn Crua: House of Saga not present
+[DEBUG] HIP 19232: House of Saga not present
+[DEBUG] Apuruk: House of Saga not present
+[DEBUG] Pitjari: House of Saga not present
+[DEBUG] Mutjarabi: House of Saga not present
+[DEBUG] Yen K'uie: House of Saga not present
+[DEBUG] Moshi: House of Saga not present
+[DEBUG] Kanawas: House of Saga not present
+[DEBUG] HIP 25843: House of Saga not present
+[DEBUG] Apishna: House of Saga not present
+[DEBUG] HIP 18527: House of Saga not present
+[DEBUG] Ixcateshai: House of Saga not present
+[DEBUG] Meidjing: House of Saga not present
+[DEBUG] Stribes: House of Saga not present
+[DEBUG] Dhrites: House of Saga not present
+[DEBUG] Phra Lule: House of Saga not present
+[DEBUG] HIP 14684: House of Saga not present
+[DEBUG] Gandra: House of Saga not present
+[DEBUG] Kratakak: House of Saga not present
+[DEBUG] Mbokos: House of Saga not present
+[DEBUG] CD-33 1835: House of Saga not present
+[DEBUG] Shongastyak: House of Saga not present
+[DEBUG] Niu Bese: House of Saga not present
+[DEBUG] Ambirikar: House of Saga not present
+[DEBUG] HIP 17483: House of Saga not present
+[DEBUG] Chnumandr: House of Saga not present
+[DEBUG] Amemets: House of Saga not present
+[DEBUG] HIP 18187: House of Saga not present
+[DEBUG] HIP 16365: House of Saga not present
+[DEBUG] HIP 22373: House of Saga not present
+[DEBUG] Formanjia: House of Saga not present
+[DEBUG] HIP 17298: House of Saga not present
+[DEBUG] Toli: House of Saga not present
+[DEBUG] HIP 16094: House of Saga not present
+[DEBUG] Kugay: House of Saga not present
+[DEBUG] Apalok: House of Saga not present
+[DEBUG] Shuna: House of Saga not present
+[DEBUG] Apian Yi: House of Saga not present
+[DEBUG] Sibilja: House of Saga not present
+[DEBUG] Inmutintien: House of Saga not present
+[DEBUG] Kushambo: House of Saga not present
+[DEBUG] Amitrimpanu: House of Saga not present
+[DEBUG] Wargis: House of Saga not present
+[DEBUG] Haokipi: House of Saga not present
+[DEBUG] Raurumbal: House of Saga not present
+[DEBUG] Chih Zha: House of Saga not present
+[DEBUG] Pirawilotri: House of Saga not present
+[DEBUG] Hyades Sector LH-L b8-3: House of Saga not present
+[DEBUG] HIP 25490: House of Saga not present
+[DEBUG] Hyades Sector UT-R c4-14: House of Saga not present
+[DEBUG] Sokolongo: House of Saga not present
+[DEBUG] HIP 22771: House of Saga not present
+[DEBUG] HIP 27330: House of Saga not present
+[DEBUG] Tenchih: House of Saga not present
+[DEBUG] Heverduduna: House of Saga not present
+[DEBUG] HIP 18707: House of Saga not present
+[DEBUG] HIP 22387: House of Saga not present
+[DEBUG] HIP 25795: House of Saga not present
+[DEBUG] HIP 15286: House of Saga not present
+[DEBUG] Kolewixil: House of Saga not present
+[DEBUG] Etmanei: House of Saga not present
+[DEBUG] Cuchan: House of Saga not present
+[DEBUG] Kongaguan: House of Saga not present
+[DEBUG] Hu Jung: House of Saga not present
+[DEBUG] Picoria: House of Saga not present
+[DEBUG] Songye: House of Saga not present
+[DEBUG] Hyades Sector UT-R c4-22: House of Saga not present
+[DEBUG] HIP 22611: House of Saga not present
+[DEBUG] Warimpe: House of Saga not present
+[DEBUG] Vinansans: House of Saga not present
+[DEBUG] HIP 24424: House of Saga not present
+[DEBUG] Lobed: House of Saga not present
+[DEBUG] Kulici: House of Saga not present
+[DEBUG] Ndebech: House of Saga not present
+[DEBUG] HIP 25190: House of Saga not present
+[DEBUG] CD-47 990: House of Saga not present
+[DEBUG] HIP 12716: House of Saga not present
+[DEBUG] Kurunmatay: House of Saga not present
+[DEBUG] Turo: House of Saga not present
+[DEBUG] Bagalya: House of Saga not present
+[DEBUG] HIP 12764: House of Saga not present
+[DEBUG] 1 G. Caeli: House of Saga not present
+[DEBUG] Ongkandjeri: House of Saga not present
+[DEBUG] HIP 22395: House of Saga not present
+[DEBUG] Basuki An: House of Saga not present
+[DEBUG] 10 Rho-3 Eridani: House of Saga not present
+[DEBUG] Kaliki: House of Saga not present
+[DEBUG] Hyades Sector XZ-P c5-20: House of Saga not present
+[DEBUG] Trianguli Sector SD-T b3-0: House of Saga not present
+[DEBUG] ICZ ZJ-Z b1: House of Saga not present
+[DEBUG] Col 285 Sector YN-I b10-3: House of Saga not present
+[DEBUG] Hyades Sector QN-T c3-8: House of Saga not present
+[DEBUG] HIP 28183: House of Saga not present
+[DEBUG] Col 285 Sector YN-I b10-6: House of Saga not present
+[DEBUG] Col 285 Sector RH-B b14-1: House of Saga not present
+[DEBUG] Hyades Sector CA-P b6-7: House of Saga not present
+[DEBUG] ICZ DQ-Y c23: House of Saga not present
+[DEBUG] Col 285 Sector ZN-I b10-3: House of Saga not present
+[DEBUG] Trianguli Sector MX-U b2-6: House of Saga not present
+[DEBUG] Col 285 Sector LB-D b13-1: House of Saga not present
+[DEBUG] Col 285 Sector GQ-O c6-22: House of Saga not present
+[DEBUG] Ceti Sector HR-V b2-5: House of Saga not present
+[DEBUG] Col 285 Sector NB-D b13-3: House of Saga not present
+[DEBUG] Ross 569: House of Saga not present
+[DEBUG] Col 285 Sector NB-D b13-0: House of Saga not present
+[DEBUG] Shui Wei Sector ZE-Z b2: House of Saga not present
+[DEBUG] HIP 29391: House of Saga not present
+[DEBUG] Col 285 Sector VH-K b9-1: House of Saga not present
+[DEBUG] Trianguli Sector VJ-R b4-6: House of Saga not present
+[DEBUG] Col 285 Sector XD-S c4-10: House of Saga not present
+[DEBUG] Ceti Sector ZE-Z b2: House of Saga not present
+[DEBUG] Hyades Sector CA-P b6-6: House of Saga not present
+[DEBUG] Col 285 Sector GQ-O c6-2: House of Saga not present
+[DEBUG] Col 285 Sector JX-U a32-0: House of Saga not present
+[DEBUG] Ceti Sector GW-V b2-3: House of Saga not present
+[DEBUG] Col 285 Sector VH-K b9-2: House of Saga not present
+[DEBUG] HIP 28241: House of Saga not present
+[DEBUG] Shui Wei Sector AA-Z b1: House of Saga not present
+[DEBUG] Hyades Sector TO-H b10-1: House of Saga not present
+[DEBUG] Col 285 Sector NQ-H b25-2: House of Saga not present
+[DEBUG] Hyades Sector TO-H b10-3: House of Saga not present
+[DEBUG] Col 285 Sector MB-D b13-1: House of Saga not present
+[DEBUG] Shui Wei Sector AA-Z b5: House of Saga not present
+[DEBUG] Col 285 Sector SH-B b14-4: House of Saga not present
+[DEBUG] Trianguli Sector FG-Y d104: House of Saga not present
+[DEBUG] HIP 27782: House of Saga not present
+[DEBUG] Col 285 Sector BK-Q c5-16: House of Saga not present
+[DEBUG] Col 285 Sector OB-D b13-6: House of Saga not present
+[DEBUG] Col 285 Sector PW-C b13-4: House of Saga not present
+[DEBUG] Col 285 Sector LB-D b13-0: House of Saga not present
+[DEBUG] Hyades Sector TD-J b9-2: House of Saga not present
+[DEBUG] Col 285 Sector AJ-I b10-1: House of Saga not present
+[DEBUG] HIP 27491: House of Saga not present
+[DEBUG] HIP 12411: House of Saga not present
+[DEBUG] HIP 27260: House of Saga not present
+[DEBUG] Col 285 Sector WI-S c4-1: House of Saga not present
+[DEBUG] Col 285 Sector QG-M b8-6: House of Saga not present
