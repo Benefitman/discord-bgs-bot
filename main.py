@@ -2,17 +2,10 @@ import os
 import discord
 import aiohttp
 import asyncio
-from discord.ext import commands
 
 TOKEN = os.getenv("DISCORD_BOT_TOKEN", "").strip()
-if not TOKEN:
-    raise ValueError("[FEHLER] Die Umgebungsvariable DISCORD_BOT_TOKEN ist nicht gesetzt!")
-
 FACTION_NAME = "House of Saga"
-CHANNEL_ID = os.getenv("DISCORD_CHANNEL_ID")
-if CHANNEL_ID is None:
-    raise ValueError("[FEHLER] Die Umgebungsvariable DISCORD_CHANNEL_ID ist nicht gesetzt!")
-CHANNEL_ID = int(CHANNEL_ID)
+CHANNEL_ID = int(os.getenv("DISCORD_CHANNEL_ID"))
 
 BGS_API_URL = "https://elitebgs.app/api/ebgs/v5"
 
@@ -21,39 +14,33 @@ intents.messages = True
 intents.guilds = True
 intents.message_content = True
 
-client = commands.Bot(command_prefix="!", intents=intents)
+client = discord.Client(intents=intents)
 
 
 async def fetch_faction_data(session):
     url = f"{BGS_API_URL}/factions"
     params = {"name": FACTION_NAME}
     async with session.get(url, params=params) as response:
-        if response.status == 200:
-            data = await response.json()
-            return data.get("docs", [])
-        else:
-            print(f"[FEHLER] Fehler beim Abrufen der Fraktionsdaten: {response.status}")
-            return []
+        data = await response.json()
+        return data.get("docs", [])
 
 
 async def fetch_system_data(session, system_name):
     url = f"{BGS_API_URL}/systems"
     params = {"name": system_name}
     async with session.get(url, params=params) as response:
-        if response.status == 200:
-            data = await response.json()
-            return data.get("docs", [])
-        else:
-            print(f"[FEHLER] Fehler beim Abrufen der Systemdaten für {system_name}: {response.status}")
-            return []
+        data = await response.json()
+        return data.get("docs", [])
 
 
-async def check_faction_influence():
-    await client.wait_until_ready()
+async def post_report():
+    await client.login(TOKEN)
+    await client.connect()
+
     async with aiohttp.ClientSession() as session:
         faction_data = await fetch_faction_data(session)
         if not faction_data:
-            print("[FEHLER] Keine Daten für die Fraktion gefunden.")
+            print("[FEHLER] Keine Fraktionsdaten erhalten.")
             await client.close()
             return
 
@@ -86,8 +73,8 @@ async def check_faction_influence():
 
         if systems_to_report:
             systems_to_report.sort(key=lambda x: x[1], reverse=True)
-
             embed_color = 0xFF5733 if has_conflict else 0x1B365D
+
             embed = discord.Embed(
                 title=f"⚠️ INFLUENCE BELOW 49% ⚠️ – {FACTION_NAME}",
                 description="**Following Systems need Work:**",
@@ -100,18 +87,13 @@ async def check_faction_influence():
                     value += f"\n**⚔️ Konflikt:** {conflict}"
                 embed.add_field(name=f"**{name}**", value=value, inline=False)
 
-            channel = client.get_channel(CHANNEL_ID)
-            if channel:
-                await channel.send(embed=embed)
+            channel = await client.fetch_channel(CHANNEL_ID)
+            await channel.send(embed=embed)
+        else:
+            print("Kein System mit niedrigem Einfluss gefunden.")
 
     await client.close()
 
 
-@client.event
-async def on_ready():
-    print(f"{client.user} eingeloggt.")
-    await check_faction_influence()
-
-
 if __name__ == "__main__":
-    client.run(TOKEN)
+    asyncio.run(post_report())
