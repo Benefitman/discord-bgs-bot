@@ -24,9 +24,17 @@ client = discord.Client(intents=intents)
 async def fetch_faction_data(session):
     url = f"{BGS_API_URL}/factions"
     params = {"name": FACTION_NAME}
-    async with session.get(url, params=params) as response:
-        data = await response.json()
-        return data.get("docs", [])
+    try:
+        async with session.get(url, params=params, timeout=15) as response:
+            if response.status != 200:
+                print(f"[WARNUNG] API-Status: {response.status}")
+                return []
+            data = await response.json()
+            return data.get("docs", [])
+    except Exception as e:
+        print(f"[FEHLER] Fehler beim Abrufen der Fraktionsdaten: {e}")
+        return []
+
 
 
 async def fetch_system_data(session, system_name):
