@@ -132,39 +132,44 @@ async def post_report():
                         close_competitor_systems.append(result)
                         break
 
-        print(f"🔻 Niedriger Einfluss: {len(low_influence_systems)}")
-        print(f"⚠️ Konkurrenzsysteme: {len(close_competitor_systems)}")
-
         if low_influence_systems or close_competitor_systems:
             print("📡 Sende Embed an Discord...")
             channel = await client.fetch_channel(CHANNEL_ID)
 
             embeds = []
             current_embed = discord.Embed(
-                title="📊 BGS Overview",
-                description="**🔻 Systems with Inf below 39%**\n ⚠️ **Enemy close by 19%** **or less**",
+                title="📊 House of Saga – BGS Overview",
+                description="🔻 **Systems with Inf below 39%**\n⚠️ **Enemy close by 19% or less**",
                 color=0xFF5733 if has_conflict else 0x1B365D
             )
 
             field_count = 0
 
-            # Füge alle Low-Influence-Systeme ein
+            # Niedriger Einfluss
             for name, infl, conflict in low_influence_systems:
+                title = f"🔻 __**{name}**__"
                 value = f"*Influence: {infl:.2f}%*"
                 if conflict:
                     value += f"\n**⚔️ Conflict:** {conflict}"
-                current_embed.add_field(name=f"🔻 {name}", value=value, inline=False)
+                value += "\n\u200b"
+                current_embed.add_field(name=title, value=value, inline=False)
                 field_count += 1
                 if field_count == 25:
                     embeds.append(current_embed)
                     current_embed = discord.Embed(color=current_embed.color)
                     field_count = 0
 
-            # Füge alle Konkurrenzsysteme ein
+            # Konkurrenzsysteme
             for name, own_infl, rival, rival_infl in close_competitor_systems:
                 diff = own_infl - rival_infl
-                value = f"*House of Saga: {own_infl:.2f}%*\n{rival}: {rival_infl:.2f}%\n⚠️ Inf Distance: {diff:.2f}%"
-                current_embed.add_field(name=f"⚠️ {name}", value=value, inline=False)
+                title = f"⚠️ __**{name}**__"
+                value = (
+                    f"**House of Saga: {own_infl:.2f}%**\n"
+                    f"*{rival}: {rival_infl:.2f}%*\n"
+                    f"*Inf Distance: {diff:.2f}%*\n"
+                    "\u200b"
+                )
+                current_embed.add_field(name=title, value=value, inline=False)
                 field_count += 1
                 if field_count == 25:
                     embeds.append(current_embed)
