@@ -121,7 +121,7 @@ async def post_report():
                     if other_infl is None:
                         return None
                     diff = influence - other_infl
-                    if 0 < diff <= 15:
+                    if 0 < diff <= 19:
                         return (system_name, influence, other_name, other_infl)
                     return None
 
