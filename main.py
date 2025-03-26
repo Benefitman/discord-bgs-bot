@@ -142,7 +142,7 @@ async def post_report():
             embeds = []
             current_embed = discord.Embed(
                 title="📊 BGS Overview",
-                description="**🟠 Systems with Inf below 39%**\n ⚠️ Enemy close by 19%** **or less**",
+                description="**🟠 Systems with Inf below 39%**\n ⚠️ **Enemy close by 19%** **or less**",
                 color=0xFF5733 if has_conflict else 0x1B365D
             )
 
