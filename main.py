@@ -142,7 +142,7 @@ async def post_report():
             embeds = []
             current_embed = discord.Embed(
                 title="📊 BGS Overview",
-                description="**🟠 Systems with Inf below 39%** and **⚠️ Enemy close by 15%** **or less**",
+                description="**🟠 Systems with Inf below 39%**\n ⚠️ Enemy close by 19%** **or less**",
                 color=0xFF5733 if has_conflict else 0x1B365D
             )
 
@@ -164,7 +164,7 @@ async def post_report():
             for name, own_infl, rival, rival_infl in close_competitor_systems:
                 diff = own_infl - rival_infl
                 value = f"*House of Saga: {own_infl:.2f}%*\n{rival}: {rival_infl:.2f}%\n⚠️ Inf Distance: {diff:.2f}%"
-                current_embed.add_field(name=f"⚠️ {name} – Enemy close by", value=value, inline=False)
+                current_embed.add_field(name=f"⚠️ {name}", value=value, inline=False)
                 field_count += 1
                 if field_count == 25:
                     embeds.append(current_embed)
