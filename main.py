@@ -16,6 +16,7 @@ CHANNEL_FACTION_MAP = {
 }
 
 BGS_API_URL = "https://elitebgs.app/api/ebgs/v5"
+TICK_CACHE_FILE = "tick_cache/global_tick.json"
 
 intents = discord.Intents.default()
 intents.messages = True
@@ -23,32 +24,6 @@ intents.guilds = True
 intents.message_content = True
 
 client = discord.Client(intents=intents)
-
-async def fetch_faction_data(session, faction_name):
-    url = f"{BGS_API_URL}/factions"
-    params = {"name": faction_name}
-    try:
-        async with session.get(url, params=params, timeout=15) as response:
-            if response.status != 200:
-                return []
-            data = await response.json()
-            return data.get("docs", [])
-    except Exception as e:
-        print(f"[ERROR] Failed to fetch faction data for {faction_name}: {e}")
-        return []
-
-async def fetch_system_data(session, system_name):
-    url = f"{BGS_API_URL}/systems"
-    params = {"name": system_name}
-    try:
-        async with session.get(url, params=params, timeout=15) as response:
-            if response.status != 200:
-                return []
-            data = await response.json()
-            return data.get("docs", [])
-    except Exception as e:
-        print(f"[ERROR] Failed to fetch system data for {system_name}: {e}")
-        return []
 
 async def fetch_tick_timestamp(session):
     url = f"{BGS_API_URL}/ticks"
@@ -63,143 +38,144 @@ async def fetch_tick_timestamp(session):
         print(f"[ERROR] Failed to fetch global tick timestamp: {e}")
     return None
 
-async def get_faction_influence_in_system(session, faction_name, system_name):
-    url = f"{BGS_API_URL}/factions"
-    params = {"name": faction_name}
+def load_last_tick():
+    if not os.path.exists(TICK_CACHE_FILE):
+        return None
     try:
-        async with session.get(url, params=params, timeout=15) as response:
-            if response.status != 200:
-                return None
-            data = await response.json()
-            for faction in data.get("docs", []):
-                for presence in faction.get("faction_presence", []):
-                    if presence.get("system_name", "").lower() == system_name.lower():
-                        return presence.get("influence", 0) * 100
+        with open(TICK_CACHE_FILE, "r") as f:
+            data = json.load(f)
+            return data.get("last_tick")
     except Exception as e:
-        print(f"[ERROR] Influence not retrievable for {faction_name} in {system_name}: {e}")
-    return None
+        print(f"[ERROR] Failed to load tick cache: {e}")
+        return None
 
-async def post_report():
-    print("\n🚀 Starting BGS Report...")
-    await client.login(TOKEN)
+def save_tick_time(tick_time):
+    os.makedirs(os.path.dirname(TICK_CACHE_FILE), exist_ok=True)
+    try:
+        with open(TICK_CACHE_FILE, "w") as f:
+            json.dump({"last_tick": tick_time}, f)
+    except Exception as e:
+        print(f"[ERROR] Failed to save tick cache: {e}")
 
+async def post_tick_time():
     async with aiohttp.ClientSession() as session:
         current_tick = await fetch_tick_timestamp(session)
         if not current_tick:
             print("[ERROR] Could not fetch global tick timestamp.")
             return
 
-        formatted_tick = datetime.fromisoformat(current_tick.replace("Z", "+00:00")).strftime("%Y-%m-%d %H:%M:%S UTC")
-        print(f"⏱️ Global Tick timestamp: {formatted_tick}")
+        last_tick = load_last_tick()
+        if current_tick == last_tick:
+            print("⏱️ Tick has not changed. Skipping post.")
+            return
 
-        for channel_id, faction_name in CHANNEL_FACTION_MAP.items():
+        formatted_tick = datetime.fromisoformat(current_tick.replace("Z", "+00:00")).strftime("%Y-%m-%d %H:%M:%S UTC")
+        print(f"⏱️ New Global Tick detected: {formatted_tick}")
+
+        for channel_id in CHANNEL_FACTION_MAP:
             channel = await client.fetch_channel(channel_id)
             await channel.send(f"⏱️ **Global Tick timestamp**: `{formatted_tick}`")
-            await channel.send(f"📈 Preparing BGS report for `{faction_name}`...")
 
-            faction_data = await fetch_faction_data(session, faction_name)
-            if not faction_data:
-                print(f"[ERROR] No faction data for {faction_name}.")
+        save_tick_time(current_tick)
+
+async def post_report():
+    async with aiohttp.ClientSession() as session:
+        for channel_id, faction_name in CHANNEL_FACTION_MAP.items():
+            print(f"\n📡 Bearbeite Fraktion: {faction_name} für Channel: {channel_id}")
+            url = f"{BGS_API_URL}/factions"
+            params = {"name": faction_name}
+            async with session.get(url, params=params) as resp:
+                data = await resp.json()
+            if not data.get("docs"):
                 continue
 
-            faction = faction_data[0]
-            presence_data = faction.get("faction_presence", [])
-            low_influence_systems = []
-            close_competitor_systems = []
+            faction = data["docs"][0]
+            presence = faction.get("faction_presence", [])
+
+            low_inf = []
+            close_comp = []
             has_conflict = False
 
-            for presence in presence_data:
-                system_name = presence.get("system_name")
-                influence = round(presence.get("influence", 0) * 100, 2)
-
-                system_data = await fetch_system_data(session, system_name)
-                if not system_data:
+            for p in presence:
+                system_name = p.get("system_name")
+                influence = p.get("influence", 0) * 100
+                sys_url = f"{BGS_API_URL}/systems"
+                sys_params = {"name": system_name}
+                async with session.get(sys_url, params=sys_params) as sys_resp:
+                    sys_data = await sys_resp.json()
+                if not sys_data.get("docs"):
                     continue
 
-                system = system_data[0]
-                controlling_faction = system.get("controlling_minor_faction", "").lower()
-                factions_in_system = system.get("factions", [])
+                sys_info = sys_data["docs"][0]
+                factions = sys_info.get("factions", [])
+                controlling = sys_info.get("controlling_minor_faction", "").lower()
 
-                if controlling_faction == faction_name.lower():
-                    if influence < 39:
-                        conflict_info = ""
-                        for conflict in presence.get("conflicts", []):
-                            status = conflict.get("status", "").lower()
-                            conflict_type = conflict.get("type", "").lower()
-                            if status in ["active", "pending"] and conflict_type in ["war", "election"]:
-                                opponent = conflict.get("opposing_faction", {}).get("name", "Unknown")
-                                conflict_info = f" – {conflict_type.title()} with {opponent}"
-                                has_conflict = True
-                                break
-                        low_influence_systems.append((system_name, influence, conflict_info))
-
-                    async def get_other_faction_info(other):
-                        other_name = other.get("name", "")
-                        if other_name.lower() == faction_name.lower():
-                            return None
-                        other_infl = await get_faction_influence_in_system(session, other_name, system_name)
-                        if other_infl is None:
-                            return None
-                        diff = influence - other_infl
-                        if 0 < diff <= 19:
-                            return (system_name, influence, other_name, other_infl)
-                        return None
-
-                    tasks = [get_other_faction_info(other) for other in factions_in_system]
-                    results = await asyncio.gather(*tasks)
-                    for result in results:
-                        if result:
-                            close_competitor_systems.append(result)
+                if controlling == faction_name.lower() and influence < 39:
+                    conflict_text = ""
+                    for c in p.get("conflicts", []):
+                        if c.get("status") in ["active", "pending"]:
+                            conflict_text = f" – {c['type'].title()} with {c['opposing_faction']['name']}"
+                            has_conflict = True
                             break
+                    low_inf.append((system_name, influence, conflict_text))
 
-            if low_influence_systems or close_competitor_systems:
-                embeds = []
-                current_embed = discord.Embed(
+                for other in factions:
+                    o_name = other.get("name")
+                    if o_name.lower() == faction_name.lower():
+                        continue
+                    other_inf = await get_faction_influence_in_system(session, o_name, system_name)
+                    if other_inf is None:
+                        continue
+                    diff = influence - other_inf
+                    if 0 < diff <= 19:
+                        close_comp.append((system_name, influence, o_name, other_inf))
+                        break
+
+            if low_inf or close_comp:
+                channel = await client.fetch_channel(channel_id)
+                embed = discord.Embed(
                     title=f"📊 {faction_name} – BGS Overview",
                     description="🔻 **Systems with Inf below 39%**\n⚠️ **Enemy close by 19% or less**",
                     color=0xFF5733 if has_conflict else 0x1B365D
                 )
 
-                field_count = 0
-
-                for name, infl, conflict in low_influence_systems:
-                    title = f"🔻 __**{name}**__"
-                    value = f"*Influence: {infl:.2f}%*"
-                    if conflict:
-                        value += f"\n**⚔️ Conflict:** {conflict}"
-                    value += "\n\u200b"
-                    current_embed.add_field(name=title, value=value, inline=False)
-                    field_count += 1
-                    if field_count == 25:
-                        embeds.append(current_embed)
-                        current_embed = discord.Embed(color=current_embed.color)
-                        field_count = 0
-
-                for name, own_infl, rival, rival_infl in close_competitor_systems:
-                    diff = own_infl - rival_infl
-                    title = f"⚠️ __**{name}**__"
-                    value = (
-                        f"**{faction_name}: {own_infl:.2f}%**\n"
-                        f"*{rival}: {rival_infl:.2f}%*\n"
-                        f"*Inf Distance: {diff:.2f}%*\n"
-                        "\u200b"
+                for name, infl, conflict in low_inf:
+                    embed.add_field(
+                        name=f"🔻 __**{name}**__",
+                        value=f"*Influence: {infl:.2f}%*\n**⚔️ Conflict:** {conflict}\n\u200b",
+                        inline=False
                     )
-                    current_embed.add_field(name=title, value=value, inline=False)
-                    field_count += 1
-                    if field_count == 25:
-                        embeds.append(current_embed)
-                        current_embed = discord.Embed(color=current_embed.color)
-                        field_count = 0
 
-                if field_count > 0:
-                    embeds.append(current_embed)
+                for name, own, rival, rival_inf in close_comp:
+                    diff = own - rival_inf
+                    embed.add_field(
+                        name=f"⚠️ __**{name}**__",
+                        value=f"**{faction_name}: {own:.2f}%**\n*{rival}: {rival_inf:.2f}%*\n*Inf Distance: {diff:.2f}%*\n\u200b",
+                        inline=False
+                    )
 
-                for embed in embeds:
-                    await channel.send(embed=embed)
+                await channel.send(embed=embed)
 
-    await client.close()
-    print("\n👋 Bot session ended.")
+async def get_faction_influence_in_system(session, faction_name, system_name):
+    url = f"{BGS_API_URL}/factions"
+    params = {"name": faction_name}
+    async with session.get(url, params=params) as response:
+        if response.status != 200:
+            return None
+        data = await response.json()
+        for faction in data.get("docs", []):
+            for presence in faction.get("faction_presence", []):
+                if presence.get("system_name", "").lower() == system_name.lower():
+                    return presence.get("influence", 0) * 100
+    return None
 
 if __name__ == "__main__":
     print("✅ Script geladen und wird gestartet...")
-    asyncio.run(post_report())
+    asyncio.run(client.login(TOKEN))
+    asyncio.run(post_tick_time())
+
+    now = datetime.utcnow().hour
+    if now in [0, 6, 12, 18]:
+        asyncio.run(post_report())
+
+    asyncio.run(client.close())
