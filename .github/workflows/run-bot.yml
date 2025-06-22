@@ -1,13 +1,14 @@
-name: Run Discord Bot every 45min
+name: Run BGS Bot
 
 on:
   schedule:
-    - cron: '*/45 * * * *'  # alle 45 Minuten
+    - cron: '*/30 * * * *'  # alle 30 Minuten
   workflow_dispatch:
 
 jobs:
   run-bot:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v3
 
@@ -23,4 +24,3 @@ jobs:
         run: python main.py
         env:
           DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
-          DISCORD_CHANNEL_ID: ${{ secrets.DISCORD_CHANNEL_ID }}
