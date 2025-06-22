@@ -24,22 +24,6 @@ intents.message_content = True
 
 client = discord.Client(intents=intents)
 
-def get_tick_cache_path(faction_name):
-    safe_name = faction_name.replace(" ", "_").lower()
-    return f"tick_timestamp_{safe_name}.txt"
-
-def load_last_tick(faction_name):
-    path = get_tick_cache_path(faction_name)
-    if os.path.exists(path):
-        with open(path, "r", encoding="utf-8") as f:
-            return f.read().strip()
-    return None
-
-def save_last_tick(faction_name, timestamp):
-    path = get_tick_cache_path(faction_name)
-    with open(path, "w", encoding="utf-8") as f:
-        f.write(timestamp)
-
 async def fetch_faction_data(session, faction_name):
     url = f"{BGS_API_URL}/factions"
     params = {"name": faction_name}
@@ -66,6 +50,19 @@ async def fetch_system_data(session, system_name):
         print(f"[ERROR] Failed to fetch system data for {system_name}: {e}")
         return []
 
+async def fetch_tick_timestamp(session):
+    url = f"{BGS_API_URL}/ticks"
+    try:
+        async with session.get(url, timeout=15) as response:
+            if response.status != 200:
+                return None
+            data = await response.json()
+            if data and isinstance(data, list) and len(data) > 0:
+                return data[0].get("time")
+    except Exception as e:
+        print(f"[ERROR] Failed to fetch global tick timestamp: {e}")
+    return None
+
 async def get_faction_influence_in_system(session, faction_name, system_name):
     url = f"{BGS_API_URL}/factions"
     params = {"name": faction_name}
@@ -87,29 +84,25 @@ async def post_report():
     await client.login(TOKEN)
 
     async with aiohttp.ClientSession() as session:
+        current_tick = await fetch_tick_timestamp(session)
+        if not current_tick:
+            print("[ERROR] Could not fetch global tick timestamp.")
+            return
+
+        formatted_tick = datetime.fromisoformat(current_tick.replace("Z", "+00:00")).strftime("%Y-%m-%d %H:%M:%S UTC")
+        print(f"⏱️ Global Tick timestamp: {formatted_tick}")
+
         for channel_id, faction_name in CHANNEL_FACTION_MAP.items():
-            print(f"\n📡 Processing: {faction_name} for Channel {channel_id}")
+            channel = await client.fetch_channel(channel_id)
+            await channel.send(f"⏱️ **Global Tick timestamp**: `{formatted_tick}`")
+            await channel.send(f"📈 Preparing BGS report for `{faction_name}`...")
+
             faction_data = await fetch_faction_data(session, faction_name)
             if not faction_data:
                 print(f"[ERROR] No faction data for {faction_name}.")
                 continue
 
             faction = faction_data[0]
-            updated_at = faction.get("updated_at", "")
-            formatted_time = datetime.fromisoformat(updated_at.replace("Z", "+00:00")).strftime("%Y-%m-%d %H:%M:%S UTC")
-            print(f"⏱️ Tick timestamp for {faction_name}: {formatted_time}")
-
-            channel = await client.fetch_channel(channel_id)
-            await channel.send(f"⏱️ **Tick timestamp for `{faction_name}`**: `{formatted_time}`")
-
-            last_tick = load_last_tick(faction_name)
-            if last_tick == updated_at:
-                await channel.send(f"🕒 No new BGS Tick detected for `{faction_name}` – skipping report.")
-                continue
-
-            save_last_tick(faction_name, updated_at)
-            await channel.send(f"📈 **New BGS Tick detected** for `{faction_name}` – preparing report...")
-
             presence_data = faction.get("faction_presence", [])
             low_influence_systems = []
             close_competitor_systems = []
