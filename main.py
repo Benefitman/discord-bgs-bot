@@ -16,6 +16,7 @@ CHANNEL_FACTION_MAP = {
 }
 
 BGS_API_URL = "https://elitebgs.app/api/ebgs/v5"
+EDCD_TICK_URL = "https://edcd.github.io/tick-detector/ticks.json"
 TICK_CACHE_FILE = "tick_cache/global_tick.json"
 
 intents = discord.Intents.default()
@@ -26,16 +27,15 @@ intents.message_content = True
 client = discord.Client(intents=intents)
 
 async def fetch_tick_timestamp(session):
-    url = f"{BGS_API_URL}/ticks"
     try:
-        async with session.get(url, timeout=15) as response:
+        async with session.get(EDCD_TICK_URL, timeout=15) as response:
             if response.status != 200:
                 return None
             data = await response.json()
             if data and isinstance(data, list) and len(data) > 0:
-                return data[0].get("time")
+                return data[0].get("timestamp")
     except Exception as e:
-        print(f"[ERROR] Failed to fetch global tick timestamp: {e}")
+        print(f"[ERROR] Failed to fetch tick from EDCD: {e}")
     return None
 
 def load_last_tick():
@@ -61,7 +61,7 @@ async def post_tick_time():
     async with aiohttp.ClientSession() as session:
         current_tick = await fetch_tick_timestamp(session)
         if not current_tick:
-            print("[ERROR] Could not fetch global tick timestamp.")
+            print("[ERROR] Could not fetch EDCD tick timestamp.")
             return
 
         last_tick = load_last_tick()
@@ -70,11 +70,11 @@ async def post_tick_time():
             return
 
         formatted_tick = datetime.fromisoformat(current_tick.replace("Z", "+00:00")).strftime("%Y-%m-%d %H:%M:%S UTC")
-        print(f"⏱️ New Global Tick detected: {formatted_tick}")
+        print(f"⏱️ New EDCD Tick detected: {formatted_tick}")
 
         for channel_id in CHANNEL_FACTION_MAP:
             channel = await client.fetch_channel(channel_id)
-            await channel.send(f"⏱️ **Global Tick timestamp**: `{formatted_tick}`")
+            await channel.send(f"⏱️ **Global Tick timestamp** (via EDCD): `{formatted_tick}`")
 
         save_tick_time(current_tick)
 
