@@ -174,7 +174,7 @@ if __name__ == "__main__":
     asyncio.run(client.login(TOKEN))
     asyncio.run(post_tick_time())
 
-    now = datetime.utcnow().hour
+    now = datetime.now(datetime.UTC).hour
     if now in [0, 6, 12, 18]:
         asyncio.run(post_report())
 
