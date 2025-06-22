@@ -1,8 +1,11 @@
-name: Run Discord Bot every 45min
+name: Run Discord Bot 4 Times Daily
 
 on:
   schedule:
-    - cron: '*/45 * * * *'  # alle 45 Minuten
+    - cron: '0 22 * * *'   # 00:00 lokal (UTC+2)
+    - cron: '0 4 * * *'    # 06:00 lokal (UTC+2)
+    - cron: '0 10 * * *'   # 12:00 lokal (UTC+2)
+    - cron: '0 16 * * *'   # 18:00 lokal (UTC+2)
   workflow_dispatch:
 
 jobs:
