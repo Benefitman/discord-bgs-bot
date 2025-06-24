@@ -1,4 +1,4 @@
-name: Tick Check 6min (05:50–10:15 UTC)
+name: Tick Check 6min (05:50–10:44 UTC)
 
 on:
   schedule:
@@ -47,6 +47,11 @@ on:
     - cron: '2 10 * * *'
     - cron: '8 10 * * *'
     - cron: '14 10 * * *'
+    - cron: '20 10 * * *'
+    - cron: '26 10 * * *'
+    - cron: '32 10 * * *'
+    - cron: '38 10 * * *'
+    - cron: '44 10 * * *'
 
   workflow_dispatch:
 
