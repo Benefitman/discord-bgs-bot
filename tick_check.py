@@ -4,6 +4,7 @@ import discord
 import aiohttp
 import asyncio
 from dotenv import load_dotenv
+from datetime import datetime
 
 load_dotenv()
 
@@ -52,9 +53,6 @@ async def post_tick_time():
             print(f"[ERROR] Exception while fetching tick: {e}")
             return
 
-        # Remove trailing .000Z for display, but store full timestamp for accurate comparison
-        display_tick = current_tick.replace(".000Z", "Z")
-
         last_tick = load_last_tick()
 
         if current_tick == last_tick:
@@ -63,9 +61,19 @@ async def post_tick_time():
 
         print(f"⏱️ New tick detected: {current_tick}")
 
+        # Format tick for display in a human-readable format like "June 25th 2025, at 09:52"
+        try:
+            dt = datetime.fromisoformat(current_tick.replace("Z", "+00:00"))
+            day = dt.day
+            suffix = "th" if 11 <= day <= 13 else {1: "st", 2: "nd", 3: "rd"}.get(day % 10, "th")
+            display_tick = dt.strftime(f"%B {day}{suffix} %Y, at %H:%M")
+        except Exception as e:
+            display_tick = current_tick  # fallback
+            print(f"[WARN] Failed to format tick timestamp: {e}")
+
         embed = discord.Embed(
             title="__**📡 Tick Just Happened!**__",
-            description=f"🕒 Tick just happened at **{display_tick}**.\nAnother day, another opportunity to shape the Galaxy!",
+            description=f"🕒 Tick just happened on **{display_tick}**.\nAnother day, another opportunity to shape the Galaxy!",
             color=discord.Color.green()
         )
         embed.set_footer(text="Elite BGS Monitor")
