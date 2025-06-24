@@ -16,7 +16,7 @@ CHANNEL_FACTION_MAP = {
 }
 
 SYSTEMS_TO_CHECK = ["Wolf 397", "Bast", "LP 98-132", "LHS 3447", "Sol", "Lave", "Cubeo"]
-EBGS_API_BASE = "https://elitebgs.app/api/ebgs/v5/systems?name={}"  # Name URL-encodieren falls nötig
+EBGS_API_BASE = "https://elitebgs.app/api/ebgs/v5/systems?name={}"
 TICK_CACHE_FILE = "tick_cache/global_tick.json"
 
 intents = discord.Intents.default()
@@ -96,9 +96,17 @@ async def post_tick_time():
                 source_system = "EDCD"
                 used_edcd = True
 
-        if not current_tick or current_tick == last_tick:
-            print("⏱️ No new tick yet. Skipping post.")
+        if not current_tick:
+            print("⏱️ No current tick timestamp. Skipping post.")
             return
+
+        if last_tick:
+            dt_current = datetime.fromisoformat(current_tick.replace("Z", "+00:00"))
+            dt_last = datetime.fromisoformat(last_tick.replace("Z", "+00:00"))
+
+            if dt_current.date() == dt_last.date():
+                print("⏱️ Tick already posted for this UTC day. Skipping post.")
+                return
 
         formatted_tick = datetime.fromisoformat(current_tick.replace("Z", "+00:00")).strftime("%Y-%m-%d %H:%M:%S UTC")
         print(f"⏱️ New tick detected: {formatted_tick} (via {source_system})")
