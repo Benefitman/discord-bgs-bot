@@ -1,8 +1,8 @@
-name: Run BGS Report 4x Daily
+name: Run BGS Report 2x Daily
 
 on:
   schedule:
-    - cron: '0 0,6,12,18 * * *'
+    - cron: '0 11,15 * * *'  # Um 11:00 und 15:00 UTC
   workflow_dispatch:
 
 jobs:
