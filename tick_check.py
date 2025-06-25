@@ -54,6 +54,9 @@ async def post_tick_time():
             return
 
         last_tick = load_last_tick()
+        print(f"[DEBUG] Loaded last_tick: {last_tick}")
+        print(f"[DEBUG] Fetched current_tick: {current_tick}")
+
 
         if current_tick == last_tick:
             print("⏱️ Tick unchanged. Skipping post.")
