@@ -79,7 +79,7 @@ async def post_tick_time():
             description=f"🕒 Tick just happened on **{display_tick}**.\nAnother day, another opportunity to shape the Galaxy!",
             color=discord.Color.green()
         )
-        embed.set_footer(text="Elite BGS Monitor")
+        embed.set_footer(text="UTC Time")
 
         for channel_id in CHANNEL_IDS:
             channel = await client.fetch_channel(channel_id)
