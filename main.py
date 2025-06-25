@@ -19,7 +19,7 @@ client = Client(intents=intents)
 
 async def announce_maintenance(mode):
     status_text = {
-        "on": "__**🛠️ Maintenance Mode Active**__\nSome services may be temporarily unavailable.",
+        "on": "__**🛠️ Maintenance Mode Active**__\nSome services may be temporarily unavailable or display inaccurate data.",
         "off": "__**✅ Maintenance Completed**__\nAll systems operational again. Thank you for your patience!"
     }
 
