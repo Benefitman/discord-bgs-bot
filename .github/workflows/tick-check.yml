@@ -79,3 +79,9 @@ jobs:
         run: python tick_check.py
         env:
           DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
+
+      - name: Save updated tick cache
+        uses: actions/cache/save@v3
+        with:
+          path: tick_cache
+          key: tick-cache
