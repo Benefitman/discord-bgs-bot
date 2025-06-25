@@ -65,7 +65,9 @@ jobs:
         uses: actions/cache@v3
         with:
           path: tick_cache
-          key: tick-cache
+          key: tick-cache-${{ github.run_id }}
+          restore-keys: |
+            tick-cache-
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -84,4 +86,4 @@ jobs:
         uses: actions/cache/save@v3
         with:
           path: tick_cache
-          key: tick-cache
+          key: tick-cache-${{ github.run_id }}
