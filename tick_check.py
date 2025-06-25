@@ -5,37 +5,30 @@ import aiohttp
 import asyncio
 from dotenv import load_dotenv
 from datetime import datetime
+import re
 
 load_dotenv()
 
 TOKEN = os.getenv("DISCORD_BOT_TOKEN", "").strip()
 CHANNEL_IDS = [1352212125300297748, 1385989063018021075]
-TICK_CACHE_FILE = "tick_cache/global_tick.json"
 TICK_URL = "http://tick.infomancer.uk/galtick.json"
 
 intents = discord.Intents.default()
 intents.messages = True
 intents.guilds = True
+
 client = discord.Client(intents=intents)
 
-def load_last_tick():
-    if not os.path.exists(TICK_CACHE_FILE):
-        return None
-    try:
-        with open(TICK_CACHE_FILE, "r") as f:
-            data = json.load(f)
-            return data.get("last_tick")
-    except Exception as e:
-        print(f"[ERROR] Failed to load tick cache: {e}")
-        return None
-
-def save_tick_time(tick_time):
-    os.makedirs(os.path.dirname(TICK_CACHE_FILE), exist_ok=True)
-    try:
-        with open(TICK_CACHE_FILE, "w") as f:
-            json.dump({"last_tick": tick_time}, f)
-    except Exception as e:
-        print(f"[ERROR] Failed to save tick cache: {e}")
+async def fetch_last_tick_from_channel(channel: discord.TextChannel) -> str | None:
+    async for message in channel.history(limit=50):
+        if message.author == client.user and message.embeds:
+            embed = message.embeds[0]
+            if embed.title and "Tick Just Happened" in embed.title:
+                footer_text = embed.footer.text or ""
+                match = re.search(r"ISO:\s*(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z)", footer_text)
+                if match:
+                    return match.group(1)
+    return None
 
 async def post_tick_time():
     async with aiohttp.ClientSession() as session:
@@ -53,25 +46,24 @@ async def post_tick_time():
             print(f"[ERROR] Exception while fetching tick: {e}")
             return
 
-        last_tick = load_last_tick()
-        print(f"[DEBUG] Loaded last_tick: {last_tick}")
-        print(f"[DEBUG] Fetched current_tick: {current_tick}")
+    for channel_id in CHANNEL_IDS:
+        channel = await client.fetch_channel(channel_id)
+        last_tick = await fetch_last_tick_from_channel(channel)
 
+        print(f"[DEBUG] Channel {channel.name} last_tick: {last_tick}")
+        print(f"[DEBUG] Current fetched tick: {current_tick}")
 
         if current_tick == last_tick:
-            print("⏱️ Tick unchanged. Skipping post.")
-            return
+            print(f"⏱️ Tick in {channel.name} unchanged. Skipping post.")
+            continue
 
-        print(f"⏱️ New tick detected: {current_tick}")
-
-        # Format tick for display in a human-readable format like "June 25th 2025, at 09:52"
         try:
             dt = datetime.fromisoformat(current_tick.replace("Z", "+00:00"))
             day = dt.day
             suffix = "th" if 11 <= day <= 13 else {1: "st", 2: "nd", 3: "rd"}.get(day % 10, "th")
             display_tick = dt.strftime(f"%B {day}{suffix} %Y, at %H:%M")
         except Exception as e:
-            display_tick = current_tick  # fallback
+            display_tick = current_tick
             print(f"[WARN] Failed to format tick timestamp: {e}")
 
         embed = discord.Embed(
@@ -79,13 +71,10 @@ async def post_tick_time():
             description=f"🕒 Tick just happened on **{display_tick}**.\nAnother day, another opportunity to shape the Galaxy!",
             color=discord.Color.green()
         )
-        embed.set_footer(text="UTC Time")
+        embed.set_footer(text=f"ISO: {current_tick} UTC")
 
-        for channel_id in CHANNEL_IDS:
-            channel = await client.fetch_channel(channel_id)
-            await channel.send(embed=embed)
-
-        save_tick_time(current_tick)
+        await channel.send(embed=embed)
+        print(f"✅ Tick posted in {channel.name}")
 
 if __name__ == "__main__":
     print("✅ Tick Check gestartet...")
