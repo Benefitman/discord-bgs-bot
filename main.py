@@ -27,7 +27,7 @@ async def announce_maintenance(mode):
         print(f"[ERROR] Invalid maintenance mode: {mode}")
         return
 
-    for channel_id in [1352212125300297748, 1385989063018021075]:
+    for channel_id in [1385989063018021075]:
         channel = await client.fetch_channel(channel_id)
         await channel.send(status_text[mode])
     print(f"[INFO] Maintenance announcement sent: {mode}")

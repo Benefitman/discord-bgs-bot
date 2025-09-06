@@ -10,7 +10,7 @@ import re
 load_dotenv()
 
 TOKEN = os.getenv("DISCORD_BOT_TOKEN", "").strip()
-CHANNEL_IDS = [1352212125300297748, 1385989063018021075]
+CHANNEL_IDS = [1385989063018021075]
 TICK_URL = "http://tick.infomancer.uk/galtick.json"
 
 intents = discord.Intents.default()
