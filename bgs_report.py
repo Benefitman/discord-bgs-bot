@@ -25,7 +25,8 @@ client = discord.Client(intents=intents)
 
 async def fetch_faction_data(session, faction_name):
     url = f"{BGS_API_URL}/factions"
-    params = {"name": faction_name}
+    # The v5 API requires `exact=true` for precise name lookups
+    params = {"name": faction_name, "exact": "true"}
     try:
         async with session.get(url, params=params, timeout=15) as response:
             if response.status != 200:
@@ -38,7 +39,8 @@ async def fetch_faction_data(session, faction_name):
 
 async def fetch_system_data(session, system_name):
     url = f"{BGS_API_URL}/systems"
-    params = {"name": system_name}
+    # Ensure system lookups are precise as well
+    params = {"name": system_name, "exact": "true"}
     try:
         async with session.get(url, params=params, timeout=15) as response:
             if response.status != 200:
@@ -51,7 +53,8 @@ async def fetch_system_data(session, system_name):
 
 async def get_faction_influence_in_system(session, faction_name, system_name):
     url = f"{BGS_API_URL}/factions"
-    params = {"name": faction_name}
+    # Use exact matching so we don't accidentally pull partial results
+    params = {"name": faction_name, "exact": "true"}
     try:
         async with session.get(url, params=params, timeout=15) as response:
             if response.status != 200:
