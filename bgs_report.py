@@ -66,9 +66,8 @@ async def get_faction_influence_in_system(session, faction_name, system_name):
         print(f"[ERROR] Influence not retrievable for {faction_name} in {system_name}: {e}")
     return None
 
-async def post_report():
+async def post_report(client: discord.Client):
     print("\n🚀 Starting BGS Report...")
-    await client.login(TOKEN)
 
     async with aiohttp.ClientSession() as session:
         for channel_id, faction_name in CHANNEL_FACTION_MAP.items():
@@ -180,9 +179,14 @@ async def post_report():
                     embed=discord.Embed().set_image(url="https://media.tenor.com/epKSpUp4d8sAAAAC/anakin-obiwan-star-wars.gif")
                 )
 
-    await client.close()
     print("\n👋 Bot session ended.")
 
 if __name__ == "__main__":
     print("✅ Script geladen und wird gestartet...")
-    asyncio.run(post_report())
+
+    async def main():
+        await client.login(TOKEN)
+        await post_report(client)
+        await client.close()
+
+    asyncio.run(main())

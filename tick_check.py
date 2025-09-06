@@ -19,7 +19,7 @@ intents.guilds = True
 
 client = discord.Client(intents=intents)
 
-async def fetch_last_tick_from_channel(channel: discord.TextChannel) -> str | None:
+async def fetch_last_tick_from_channel(client: discord.Client, channel: discord.TextChannel) -> str | None:
     async for message in channel.history(limit=50):
         if message.author == client.user and message.embeds:
             embed = message.embeds[0]
@@ -30,7 +30,7 @@ async def fetch_last_tick_from_channel(channel: discord.TextChannel) -> str | No
                     return match.group(1)
     return None
 
-async def post_tick_time():
+async def post_tick_time(client: discord.Client):
     async with aiohttp.ClientSession() as session:
         try:
             async with session.get(TICK_URL, timeout=15) as response:
@@ -48,7 +48,7 @@ async def post_tick_time():
 
     for channel_id in CHANNEL_IDS:
         channel = await client.fetch_channel(channel_id)
-        last_tick = await fetch_last_tick_from_channel(channel)
+        last_tick = await fetch_last_tick_from_channel(client, channel)
 
         print(f"[DEBUG] Channel {channel.name} last_tick: {last_tick}")
         print(f"[DEBUG] Current fetched tick: {current_tick}")
@@ -81,7 +81,7 @@ if __name__ == "__main__":
 
     async def main():
         await client.login(TOKEN)
-        await post_tick_time()
+        await post_tick_time(client)
         await client.close()
 
     asyncio.run(main())
