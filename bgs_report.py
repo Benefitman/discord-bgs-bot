@@ -11,8 +11,7 @@ load_dotenv()
 TOKEN = os.getenv("DISCORD_BOT_TOKEN", "").strip()
 
 CHANNEL_FACTION_MAP = {
-    1352212125300297748: "House of Saga",
-    1385989063018021075: "Torval Mining Ltd"
+    1385989063018021075: "Torval Mining Ltd",
 }
 
 BGS_API_URL = "https://elitebgs.app/api/ebgs/v5"
