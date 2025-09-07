@@ -6,6 +6,8 @@ from discord import Client, Intents
 from dotenv import load_dotenv
 import os
 
+import eddn_listener
+
 load_dotenv()
 
 TOKEN = os.getenv("DISCORD_BOT_TOKEN", "").strip()
@@ -34,17 +36,20 @@ async def announce_maintenance(mode):
 
 async def main(mode, submode=None):
     await client.login(TOKEN)
-
-    if mode == "tick":
-        await post_tick_time(client)
-    elif mode == "bgs":
-        await post_report(client)
-    elif mode == "maintenance" and submode in {"on", "off"}:
-        await announce_maintenance(submode)
-    else:
-        print("[ERROR] Unknown or incomplete mode.")
-
-    await client.close()
+    listener_task = asyncio.create_task(eddn_listener.run())
+    try:
+        if mode == "tick":
+            await post_tick_time(client)
+        elif mode == "bgs":
+            await post_report(client)
+        elif mode == "maintenance" and submode in {"on", "off"}:
+            await announce_maintenance(submode)
+        else:
+            print("[ERROR] Unknown or incomplete mode.")
+    finally:
+        await eddn_listener.stop()
+        await client.close()
+        await listener_task
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run ED BGS Bot")
